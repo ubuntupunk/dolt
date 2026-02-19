@@ -1,0 +1,46 @@
+name: Build Statically Linked Dolt
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.23-alpine # Use Alpine to ensure musl linking
+    steps:
+      - name: Checkout Dolt
+        uses: actions/checkout@v4
+        with:
+          repository: dolthub/dolt
+          ref: main # Or a specific tag like 'v1.43.0'
+
+      - name: Install Build Dependencies
+        run: |
+          apk add --no-cache \
+            gcc \
+            g++ \
+            musl-dev \
+            icu-dev \
+            git \
+            make \
+            bash
+
+      - name: Compile Dolt
+        run: |
+          cd go
+          # Force CGO and static linking
+          CGO_ENABLED=1 go build \
+            -ldflags '-linkmode external -extldflags "-static"' \
+            -o ../dolt-static \
+            ./cmd/dolt
+
+      - name: Verify Binary
+        run: |
+          file ./dolt-static
+          # Check for 'statically linked' in output
+          # ldd will say 'Not a dynamic executable' if successful
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dolt-ubuntu-24-04-portable
+          path: ./dolt-static
