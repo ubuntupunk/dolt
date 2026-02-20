@@ -1,4 +1,4 @@
-name: Build Statically Linked Dolt
+name: Build Statically Linked Dolt with Musl
 on: [push, workflow_dispatch]
 
 jobs:
@@ -12,7 +12,15 @@ jobs:
         with:
           repository: dolthub/dolt
           ref: main # Or a specific tag like 'v1.43.0'
-
+          
+      - name: Set up Go 1.25.6
+        uses: actions/setup-go@v6 
+        with:
+          go-version: '1.25.6'
+          
+      - name: Verify Go version
+        run: go version
+      
       - name: Install Build Dependencies
         run: |
           apk add --no-cache \
