@@ -28,6 +28,7 @@ jobs:
             g++ \
             musl-dev \
             icu-dev \
+            icu-static \
             git \
             make \
             bash
