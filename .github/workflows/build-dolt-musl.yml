@@ -31,7 +31,8 @@ jobs:
             icu-static \
             git \
             make \
-            bash
+            bash \
+            file
 
       - name: Compile Dolt
         run: |
